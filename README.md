@@ -38,6 +38,10 @@ used to encrypt and decrypt the upload IDs.
 
 Returns a tus store.
 
+**decodeKey(uploadId)**
+
+Returns the `key` encoded in `uploadId`.
+
 ```javascript
 import keyedStore from 'keyed-tus-store'
 import { memstore } from 'abstract-tus-store'
