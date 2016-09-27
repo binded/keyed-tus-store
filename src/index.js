@@ -40,9 +40,22 @@ export default (wrappedStore, secret) => {
     info: async (uploadId, ...args) => (
       wrappedStore.info(decode(uploadId).uploadId, ...args)
     ),
-    append: async (uploadId, ...args) => (
-      wrappedStore.append(decode(uploadId).uploadId, ...args)
-    ),
+    append: async (uploadId, rs, arg3, arg4) => {
+      const encodedUploadId = uploadId
+      const { expectedOffset, opts = {} } = (() => {
+        if (typeof arg3 === 'object') {
+          return { opts: arg3 }
+        }
+        return { expectedOffset: arg3, opts: arg4 }
+      })()
+      const { beforeComplete = async () => {} } = opts
+      return wrappedStore.append(decode(uploadId).uploadId, rs, expectedOffset, {
+        ...opts,
+        beforeComplete: async (upload, _, ...otherArgs) => (
+          beforeComplete(upload, encodedUploadId, ...otherArgs)
+        ),
+      })
+    },
     decodeKey: (encodedUploadId) => {
       const { key } = decode(encodedUploadId)
       return key
